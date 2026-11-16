@@ -59,8 +59,9 @@ vault kv list -format=json <マウント>/servers
 curl -s -o /dev/null -w "%{http_code}\n" -X LIST -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/<マウント>/metadata/servers/"
 ```
 
-`200` (既に行がある) か `404` (まだ 1 行も無い) なら接続できている。`403` は権限の不足、`000` は接続できていない。
-`403` と `000` のときは作業を始めずに人間に伝える。
+`200` (既に行がある) か `404` (まだ 1 行も無い) なら接続できている。`000` は接続できていない。
+`403` は権限の不足か、`VAULT_TOKEN` が設定されていない (空でも `403` になる)。設定の有無は値を出さずに確認する
+(`[ -n "$VAULT_TOKEN" ] && echo set || echo empty`)。`403` と `000` のときは作業を始めずに人間に伝える。
 
 ### 2. 移行の一覧
 
