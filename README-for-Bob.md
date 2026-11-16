@@ -1,7 +1,7 @@
 # vault-for-bob: Bob の案内でパスワード一覧を Vault に移行する
 
 IBM Bob が、HashiCorp Vault (KV v2) の Web UI の操作を 1 操作ずつ案内するスキルです。
-共有のパスワード一覧 (Excel・CSV) の行を Vault のシークレットに移行し、
+Excel や CSV の共有のパスワード一覧の行を Vault のシークレットに移行し、
 [screenshot-for-bob](https://github.com/unnowataru/screenshot-for-bob) と組み合わせて手順書の画像も作成します。
 
 ## 特徴
@@ -35,7 +35,7 @@ vault token create -policy=bob-list -ttl=8h -display-name=bob
 ## 使い方の例
 
 1. Playwright MCP のブラウザーで Vault の Web UI を開き、ログインしておきます
-2. 移行元の一覧から、パスワードの列を除いたファイルを用意します (例: [`examples/servers.csv`](examples/servers.csv) のパスワードの列を削除したもの)
+2. 移行元の一覧から、パスワードの列を除いた CSV のファイルを用意します (例: [`examples/servers.csv`](examples/servers.csv) のパスワードの列を削除したもの)。Excel の一覧は、パスワードの列を削除してから CSV で保存します
 3. Bob のチャットで、次のように依頼します
 
 > サーバーの一覧 (servers.csv の サーバー名・用途・ユーザー の列) を Vault の kv/servers/ に移行したい。
