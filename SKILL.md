@@ -25,6 +25,8 @@ Vault の Web UI で、共有のパスワード一覧の行を KV v2 のシー�
 - **トークンを表示しない。** API のトークンは、人間が Bob の起動前に環境変数 `VAULT_TOKEN` に設定したものだけを使う。依頼文・ファイル・コマンドの引数で受け取らない。`echo $VAULT_TOKEN` や `env` の全件表示など、値が出力に出るコマンドを実行しない
 - **UI のパスワードの欄に入力しない。UI のボタンをクリックしない。** UI の操作は人間が行う。Save、Delete、Destroy、値の表示 (目のアイコン)、Copy、Secret タブの JSON / YAML の切り替えは、とくに Bob が触らない
 - **ログインした後に `browser_navigate` を使わない。** Vault の UI はページを読み込み直すとログインが消える。画面の移動は人間のクリックで行う
+- **撮影でページが読み込み直されたら、別の方法で注釈を入れない。** screenshot-for-bob が「CSP のため読み込み直した」と返し、ログインが消えたときは、
+  `browser_evaluate` などで注釈を入れ直さない。撮影を止め、Playwright MCP の設定 (`bypassCSP`) を利用者に確認してもらう (README-for-Bob.md の前提条件)
 - **`browser_take_screenshot` を使わない。** 画像がモデルに返る。撮影は screenshot-for-bob で行う。値の欄に入力された後の画面で `browser_snapshot` を使わない
 - 完了の報告に書くのは、件数と移行先のパスだけ。値は書かない
 

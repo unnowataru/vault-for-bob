@@ -14,6 +14,8 @@ Excel や CSV の共有のパスワード一覧の行を Vault のシークレ�
 
 - Vault (KV v2 のシークレットエンジンが有効) と、Web UI にログインできるアカウント
 - Bob に Playwright MCP が接続されていること (設定は screenshot-for-bob の README-for-Bob.md を参照)
+- Playwright MCP の設定で、ブラウザーが CSP を無視するようにしてあること (下記)。Vault の Web UI は CSP が厳しく、
+  この設定が無いと、screenshot-for-bob が注釈を入れるためにページを読み込み直し、そのたびに Vault のログインが消えます
 - 手順書の画像を撮影する場合は screenshot-for-bob
 - Bob 用の Vault のトークン。移行先の一覧の取得だけを許可する policy を付けます (例: [`examples/policy-bob-list.hcl`](examples/policy-bob-list.hcl))
 
@@ -24,13 +26,26 @@ vault policy write bob-list examples/policy-bob-list.hcl
 vault token create -policy=bob-list -ttl=8h -display-name=bob
 ```
 
+Playwright MCP の設定ファイル (例: `C:\Users\<ユーザー名>\.bob\settings\playwright-mcp-config.json`) を作成します。
+
+```json
+{
+  "browser": {
+    "contextOptions": { "bypassCSP": true }
+  }
+}
+```
+
+Bob の `mcp.json` の playwright の `args` に、`"--config"` とこのファイルのパスを追加します。この設定は Bob の Playwright のブラウザーにだけ効き、
+普段使うブラウザーには影響しません。`--isolated` (専用のプロファイル) と組み合わせて使うことをお勧めします。
+
 ## 入れ方
 
 1. `vault-for-bob` フォルダーを次の場所に配置します
    - どのワークスペースでも使う場合: `C:\Users\<ユーザー名>\.bob\skills\vault-for-bob`
    - 特定のフォルダーだけで使う場合: そのフォルダーの `.bob\skills\vault-for-bob`
-2. Bob を起動する前に、環境変数 `VAULT_ADDR` (例: `https://vault.example.internal:8200`) と `VAULT_TOKEN` (Bob 用のトークン) を設定します
-3. Bob を開き直します
+2. Bob のすべてのウィンドウを閉じて終了し、環境変数 `VAULT_ADDR` (例: `https://vault.example.internal:8200`) と `VAULT_TOKEN` (Bob 用のトークン) を設定したシェルから Bob を起動します。
+   Bob のウィンドウが 1 つでも残っていると、新しく起動した Bob は既存のプロセスに引き継がれ、環境変数が届きません
 
 ## 使い方の例
 
