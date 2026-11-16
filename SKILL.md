@@ -26,7 +26,7 @@ Vault の Web UI で、共有のパスワード一覧の行を KV v2 のシー�
   Excel の一覧は、CSV で保存し直してもらってから読む。値が依頼文やコマンドの出力に含まれていたら使わず、そのことを伝える
 - **一覧のファイルを編集しない。** 移行した行の削除も含め、ファイルの書き換えは中身 (パスワードの列) を読み込むことになる。利用者に依頼されても行わず、人間が削除するよう伝える
 - **Vault の値を API で読まない・書かない。** API で使うのは一覧 (LIST) とメタデータの読み取りだけ。`vault kv get`・`vault kv put`・`/v1/<マウント>/data/` への要求は使わない
-- **トークンを表示しない。** API のトークンは、人間が Bob の起動前に環境変数 `VAULT_TOKEN` に設定したものだけを使う。依頼文・ファイル・コマンドの引数で受け取らない。`echo $VAULT_TOKEN` や `env` の全件表示など、値が出力に出るコマンドを実行しない
+- **トークンを表示しない。** API のトークンは、人間が Bob の起動前に環境変数 `VAULT_TOKEN` に設定したものだけを使う。依頼文・ファイル・コマンドの引数で受け取らない。`echo $VAULT_TOKEN`・`$env:VAULT_TOKEN`、`env`・`Get-ChildItem env:` の全件表示など、値が出力に出るコマンドを実行しない
 - **UI のパスワードの欄に入力しない。UI のボタンをクリックしない。** UI の操作は人間が行う。Save、Delete、Destroy、値の表示 (目のアイコン)、Copy、Secret タブの JSON / YAML の切り替えは、とくに Bob が触らない
 - **ログインした後に `browser_navigate` を使わない。** Vault の UI はページを読み込み直すとログインが消える。画面の移動は人間のクリックで行う
 - **撮影でページが読み込み直されたら、別の方法で注釈を入れない。** screenshot-for-bob が「CSP のため読み込み直した」と返し、ログインが消えたときは、
@@ -58,17 +58,37 @@ Vault の Web UI で、共有のパスワード一覧の行を KV v2 のシー�
 | 移行元の一覧のファイルと、読み込んでよい列 | なし (必ず確認する) |
 | 手順書の画像を撮影するか、保存先 | 撮影する。`screenshots/` |
 
-続けて、API に接続できるかを確認する (トークンは表示しない)。
+続けて、API に接続できるかを確認する (トークンは表示しない)。シェルに合わせて書き方を選ぶ。
+PowerShell では、環境変数は `$env:VAULT_TOKEN` と書く (`$VAULT_TOKEN` は PowerShell の変数で、空になり `403` が返る)。
 
 ```bash
+# bash
 vault kv list -format=json <マウント>/servers
 # vault CLI が無いとき
 curl -s -o /dev/null -w "%{http_code}\n" -X LIST -H "X-Vault-Token: $VAULT_TOKEN" "$VAULT_ADDR/v1/<マウント>/metadata/servers/"
 ```
 
+```powershell
+# PowerShell
+vault kv list -format=json <マウント>/servers
+# vault CLI が無いとき
+curl.exe -s -o NUL -w "%{http_code}\n" -X LIST -H "X-Vault-Token: $env:VAULT_TOKEN" "$env:VAULT_ADDR/v1/<マウント>/metadata/servers/"
+```
+
 `200` (既に行がある) か `404` (まだ 1 行も無い) なら接続できている。`000` は接続できていない。
-`403` は権限の不足か、`VAULT_TOKEN` が設定されていない (空でも `403` になる)。設定の有無は値を出さずに確認する
-(`[ -n "$VAULT_TOKEN" ] && echo set || echo empty`)。`403` と `000` のときは作業を始めずに人間に伝える。
+`403` は権限の不足か、`VAULT_TOKEN` が設定されていない (空でも `403` になる)。設定の有無は、値を出さずに次のコマンドで確認する。
+
+```bash
+# bash
+[ -n "$VAULT_TOKEN" ] && echo set || echo empty
+```
+
+```powershell
+# PowerShell
+if ($env:VAULT_TOKEN) { "set" } else { "empty" }
+```
+
+`403` と `000` のときは作業を始めずに人間に伝える。
 
 ### 2. 移行の一覧
 

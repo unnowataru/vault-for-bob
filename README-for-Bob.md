@@ -13,7 +13,7 @@ Excel や CSV の共有のパスワード一覧の行を Vault のシークレ�
 ## 前提条件
 
 - Vault (KV v2 のシークレットエンジンが有効) と、Web UI にログインできるアカウント
-- Bob に Playwright MCP が接続されていること (設定は screenshot-for-bob の README-for-Bob.md を参照)
+- Bob に Playwright MCP が接続されていること。設定は [screenshot-for-bob](https://github.com/unnowataru/screenshot-for-bob) の README-for-Bob.md を参照してください (Playwright MCP 0.0.83 で確認)
 - Playwright MCP の設定で、ブラウザーが CSP を無視するようにしてあること (下記)。Vault の Web UI は CSP が厳しく、
   この設定が無いと、screenshot-for-bob が注釈を入れるためにページを読み込み直し、そのたびに Vault のログインが消えます
 - 手順書の画像を撮影する場合は screenshot-for-bob
@@ -39,12 +39,15 @@ Playwright MCP の設定ファイル (例: `C:\Users\<ユーザー名>\.bob\sett
 Bob の `mcp.json` の playwright の `args` に、`"--config"` とこのファイルのパスを追加します。この設定は Bob の Playwright のブラウザーにだけ効き、
 普段使うブラウザーには影響しません。`--isolated` (専用のプロファイル) と組み合わせて使うことをお勧めします。
 
+この設定のブラウザーは、開いたすべてのサイトで CSP が無効になります。**この設定のブラウザーで Vault 以外のサイトを開かないでください。**
+
 ## 入れ方
 
-1. `vault-for-bob` フォルダーを次の場所に配置します
+1. [Releases](https://github.com/unnowataru/vault-for-bob/releases) から `vault-for-bob.zip` をダウンロードして展開します
+2. 展開した `vault-for-bob` フォルダーを次の場所に配置します
    - どのワークスペースでも使う場合: `C:\Users\<ユーザー名>\.bob\skills\vault-for-bob`
    - 特定のフォルダーだけで使う場合: そのフォルダーの `.bob\skills\vault-for-bob`
-2. Bob のすべてのウィンドウを閉じて終了し、環境変数 `VAULT_ADDR` (例: `https://vault.example.internal:8200`) と `VAULT_TOKEN` (Bob 用のトークン) を設定したシェルから Bob を起動します。
+3. Bob のすべてのウィンドウを閉じて終了し、環境変数 `VAULT_ADDR` (例: `https://vault.example.internal:8200`) と `VAULT_TOKEN` (Bob 用のトークン) を設定したシェルから Bob を起動します。
    Bob のウィンドウが 1 つでも残っていると、新しく起動した Bob は既存のプロセスに引き継がれ、環境変数が届きません
 
 ## 使い方の例

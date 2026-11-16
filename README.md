@@ -32,7 +32,7 @@ IBM Bob (IDE / Bob Shell) 用のスキル。HashiCorp Vault (KV v2) の Web UI �
 スキルの文面どおりに進むかを、Claude Code にこのフォルダーを読み込ませて確認する。Bob で通る保証にはならない。
 
 1. テスト用の Vault を用意する (本番の Vault は使わない)。KV v2 を `kv/` に有効化し、`examples/policy-bob-list.hcl` の policy とトークンを作成する
-2. `VAULT_ADDR` と `VAULT_TOKEN` (Bob 用のトークン) を設定して Claude Code を起動し、SKILL.md を読ませて、README-for-Bob.md の依頼文で依頼する
+2. `VAULT_ADDR` と `VAULT_TOKEN` (Bob 用のトークン) を設定して Claude Code を起動し、SKILL.md を読ませて、README-for-Bob.md のサンプルのプロンプトで依頼する
 3. 次を確認する
    - 見出しの行だけを読み、読み込む列の確認を求め、確認した列だけをコマンドで取り出す (ファイル全体を開かない)
    - 一覧のファイルを編集しない (行の削除を依頼しても人間に任せる)
@@ -69,18 +69,18 @@ Vault 2.2.2 (KV v2 を `kv/` に有効化) で、架空の 1 行を移行した�
 
 ### Bob での確認
 
-配布するのは、Bob で確認した版だけ。確認した版にタグを付ける。
+Bob で確認したコミットにタグを付けて配布する。Bob での確認の後に変更した項目は、Bob では未確認と書く。
 
 1. `python tools/package.py` で zip を作成し、展開した `vault-for-bob` フォルダーを `~/.bob/skills/` に配置する。screenshot-for-bob も配置する
 2. テスト用の Vault と Bob 用のトークンを用意し、`VAULT_ADDR` と `VAULT_TOKEN` を設定してから Bob を起動する
 3. Playwright MCP のブラウザーで Vault の UI にログインする
-4. README-for-Bob.md の依頼文で依頼し、`examples/servers.csv` で 1 行だけ移行する
+4. README-for-Bob.md のサンプルのプロンプトで依頼し、`examples/servers.csv` で 1 行だけ移行する
 5. Claude Code での確認と同じ項目に加え、次を確認する
-   - Bob がスキルを選ぶか (依頼文でスキルの名前を挙げたとき、挙げないとき)
+   - Bob がスキルを選ぶか (プロンプトでスキルの名前を挙げたとき、挙げないとき)
    - Bob のツールの承認の画面で、Vault の API を呼び出すコマンドにトークンの値が書かれていない
    - 撮影した 4 枚で、02 の値の欄が黒塗りされている
    - 承認の回数と、1 行にかかる時間
-6. 確認に使った Bob の版、Vault の版、Playwright MCP の版を記録してタグを付ける (`git tag v<バージョン>`)
+6. 確認に使った Bob・Vault・Playwright MCP のバージョンを記録してタグを付ける (`git tag v<バージョン>`)
 
 ### Bob での確認の結果
 
@@ -88,13 +88,12 @@ Vault 2.2.2 (KV v2 を `kv/` に有効化) で、架空の 1 行を移行した�
 
 | 確認 | 結果 |
 |---|---|
-| スキルの選択 | 依頼文でスキルの名前を挙げたときに選んだ。挙げないときは確認していない |
+| スキルの選択 | プロンプトでスキルの名前を挙げたときに選んだ |
 | 撮影の一覧 | 4 枚の一覧を提示し、02 を「値の欄は黒塗り」と書いて確認を求めた |
 | 撮影した 4 枚 | 01〜04 とも撮影できた。02 の password の値の欄は黒塗り、03 の値は伏字。IP アドレス・メールアドレス・トークンは写っていない |
 | 01 の対象の指定 | 最初に `text=kv/` と書き、SKILL.md の `role=link[name="kv/"]` に直して撮影した |
-| 承認の画面のトークンの値 | 利用者の目視で、出ていなかった (記録は残していない) |
-| 1 行にかかった時間 | 01〜04 の撮影を含めて約 10 分。承認の回数は数えていない |
-| 保存後の API の一覧での確認 | 記録していない |
+| 承認の画面のトークンの値 | 利用者の目視で、出ていなかった |
+| 1 行にかかった時間 | 01〜04 の撮影を含めて約 10 分 |
 
 確認の中で見つかった問題と対応は次のとおり。
 
@@ -103,7 +102,11 @@ Vault 2.2.2 (KV v2 を `kv/` に有効化) で、架空の 1 行を移行した�
 | Vault の CSP で screenshot-for-bob がページを読み込み直し、撮影のたびにログインが消えた | Playwright MCP の設定ファイルで `contextOptions.bypassCSP` を有効にした。README-for-Bob.md の前提条件に追加 |
 | ログインが消えた後、Bob が `browser_evaluate` で注釈を入れる方法を提案した (スキルに無い手順) | 実行させずに止めた。SKILL.md の守ることに「別の方法で注釈を入れない」を追加 |
 | Bob のウィンドウが残った状態で、環境変数を設定して起動しても `VAULT_TOKEN` が届かなかった | Bob をすべて終了してから起動する。README-for-Bob.md の入れ方に追加 |
-| Bob の画面に、スキルとワークスペースのパスとしてユーザー名を含むパスが表示された | 画面を撮影で見せる場合は、ユーザーのフォルダーの外にワークスペースを作り、スキルをワークスペースの `\.bob\skills\` に置く |
+
+### v0.1.0 と Bob での確認の範囲
+
+v0.1.0 は、上の Bob 2.3.0 での確認で撮影に使ったスキルのバージョン。撮影の後に、SKILL.md の守ることに「一覧のファイルを編集しない」(移行した行の削除も人間が行う) を追加した。
+このルールは Bob では未確認。
 
 ## 配布
 
@@ -111,7 +114,11 @@ Vault 2.2.2 (KV v2 を `kv/` に有効化) で、架空の 1 行を移行した�
 python tools/package.py
 ```
 
-`dist/vault-for-bob.zip` ができる (`dist/` は Git の管理外)。GitHub の Releases に添付して配る。
+`dist/vault-for-bob.zip` ができる (`dist/` は Git の管理外)。この zip を GitHub の Releases に添付して配る。
+
+```bash
+gh release create v<バージョン> dist/vault-for-bob.zip --title "v<バージョン>" --notes "<変更点>"
+```
 
 ## ライセンス
 
