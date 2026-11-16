@@ -60,6 +60,9 @@ Vault 2.2.2 (KV v2 を `kv/` に有効化) で、架空の 1 行を移行した�
 02 の黒塗りを利用者の指示で外す流れも、Claude Code (ツールなし、SKILL.md をシステムプロンプトに入れた別プロセス) で確認した。
 最初の一覧で 02 を「値の欄は黒塗り」と書き、利用者が「黒塗りしない」と直すと「値の欄は黒塗りなし (利用者の指示)」に書き換えて再確認を求め、
 `{ mask: "auto" }` は残し、値の欄の mask だけを付けなかった。spec の書き方は screenshot-for-bob の形にならなかったため、SKILL.md に 02 の spec の例を加えた。
+例を加えた後、screenshot-for-bob の SKILL.md も一緒にシステムプロンプトに入れて、既定の場合と黒塗りを外した場合の 2 通りで 02 の撮影を依頼した。
+どちらも `window.__sfbSpec = { out, items }` の形になり、外した場合は `{ mask: 'role=textbox[name="password"]' }` の 1 行だけが無く、`{ mask: "auto" }` は残った。
+どちらも値の入力後に `browser_snapshot` と `browser_navigate` を使わなかった。
 
 この確認では screenshot-for-bob を使っておらず、注釈と黒塗りの付いた画像は作成していない。Bob での確認で行う。
 
