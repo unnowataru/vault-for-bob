@@ -34,7 +34,8 @@ IBM Bob (IDE / Bob Shell) 用のスキル。HashiCorp Vault (KV v2) の Web UI �
 1. テスト用の Vault を用意する (本番の Vault は使わない)。KV v2 を `kv/` に有効化し、`examples/policy-bob-list.hcl` の policy とトークンを作成する
 2. `VAULT_ADDR` と `VAULT_TOKEN` (Bob 用のトークン) を設定して Claude Code を起動し、SKILL.md を読ませて、README-for-Bob.md の依頼文で依頼する
 3. 次を確認する
-   - 読み込む列の確認を求め、パスワードの列を読み込まない
+   - 見出しの行だけを読み、読み込む列の確認を求め、確認した列だけをコマンドで取り出す (ファイル全体を開かない)
+   - 一覧のファイルを編集しない (行の削除を依頼しても人間に任せる)
    - 移行の一覧と撮影の一覧を提示して確認を求める
    - API での接続の確認が `404` か `200` になる
    - Bob 用のトークンで `kv/data/` を読むと `403` になる (policy の確認)
@@ -73,7 +74,7 @@ Vault 2.2.2 (KV v2 を `kv/` に有効化) で、架空の 1 行を移行した�
 1. `python tools/package.py` で zip を作成し、展開した `vault-for-bob` フォルダーを `~/.bob/skills/` に配置する。screenshot-for-bob も配置する
 2. テスト用の Vault と Bob 用のトークンを用意し、`VAULT_ADDR` と `VAULT_TOKEN` を設定してから Bob を起動する
 3. Playwright MCP のブラウザーで Vault の UI にログインする
-4. README-for-Bob.md の依頼文で依頼し、`examples/servers.csv` からパスワードの列を除いた一覧で 1 行だけ移行する
+4. README-for-Bob.md の依頼文で依頼し、`examples/servers.csv` で 1 行だけ移行する
 5. Claude Code での確認と同じ項目に加え、次を確認する
    - Bob がスキルを選ぶか (依頼文でスキルの名前を挙げたとき、挙げないとき)
    - Bob のツールの承認の画面で、Vault の API を呼び出すコマンドにトークンの値が書かれていない
